@@ -8,55 +8,60 @@ import {
   Typography,
   Box,
   Alert,
+  CircularProgress
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      console.log('Attempting login with:', formData.email);
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
-
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
 
+      const data = await response.json();
+      
+      // Use the login function from AuthContext
       login(data);
+      
+      // Redirect to the page they tried to visit or dashboard
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || 'Failed to login. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,8 +104,9 @@ const Login = () => {
               variant="contained"
               color="primary"
               sx={{ mt: 3 }}
+              disabled={loading}
             >
-              Login
+              {loading ? <CircularProgress size={24} /> : 'Login'}
             </Button>
           </form>
         </Paper>

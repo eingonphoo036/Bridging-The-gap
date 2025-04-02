@@ -9,15 +9,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in on mount
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
   }, []);
 
   const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    // Store user data and token
+    setUser(userData.user);
+    localStorage.setItem('user', JSON.stringify(userData.user));
+    localStorage.setItem('token', userData.token);
   };
 
   const logout = () => {

@@ -6,253 +6,193 @@ import {
   Grid,
   Card,
   CardContent,
+  CardMedia,
   TextField,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   CircularProgress,
   Alert,
+  Divider,
+  Chip
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import { useAuth } from '../context/AuthContext';
 
 function LivingCosts() {
-  const [newItem, setNewItem] = useState('');
-  const [selectedStore, setSelectedStore] = useState('all');
-  const [shoppingList, setShoppingList] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priceComparisons, setPriceComparisons] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const stores = [
-    { id: 'tesco', name: 'Tesco', location: 'City Center' },
-    { id: 'primark', name: 'Primark', location: 'High Street' },
-    { id: 'argos', name: 'Argos', location: 'Shopping Mall' },
-    { id: 'sainsburys', name: "Sainsbury's", location: 'City Center' },
-    { id: 'aldi', name: 'Aldi', location: 'High Street' },
-    { id: 'bm', name: 'B&M', location: 'Shopping Mall' },
-    { id: 'currys', name: 'Currys', location: 'Retail Park' },
-    { id: 'johnlewis', name: 'John Lewis', location: 'City Center' }
-  ];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [retailers, setRetailers] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPriceComparisons = async () => {
       try {
         setLoading(true);
         setError(null);
+        const token = localStorage.getItem('token');
         
-        console.log('Fetching price comparisons...');
-        const response = await fetch('/api/price-comparisons');
-        console.log('Response status:', response.status);
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        const response = await fetch('/api/price-comparisons', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
         
         if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('Please log in to view price comparisons');
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Fetched data:', data);
-        
-        if (!Array.isArray(data)) {
-          throw new Error('Data is not an array');
+        setCategories(data);
+        if (data.length > 0) {
+          setSelectedCategory(data[0].category);
         }
-        
-        setPriceComparisons(data);
-      } catch (err) {
-        console.error('Error fetching price comparisons:', err);
-        setError(err.message || 'Failed to fetch price comparisons');
+      } catch (error) {
+        console.error('Error fetching price comparisons:', error);
+        setError(error.message || 'Failed to fetch price comparisons. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPriceComparisons();
-  }, []);
-
-  const handleAddItem = () => {
-    if (newItem.trim()) {
-      setShoppingList([...shoppingList, { id: Date.now(), name: newItem }]);
-      setNewItem('');
+    if (user) {
+      fetchPriceComparisons();
     }
-  };
+  }, [user]);
 
-  const handleDeleteItem = (id) => {
-    setShoppingList(shoppingList.filter((item) => item.id !== id));
-  };
+  // Update retailers when category changes
+  useEffect(() => {
+    if (selectedCategory && categories.length > 0) {
+      const category = categories.find(cat => cat.category === selectedCategory);
+      if (category && category.items.length > 0) {
+        // Get all unique retailers from the items in the selected category
+        const allRetailers = new Set();
+        category.items.forEach(item => {
+          Object.keys(item.prices).forEach(retailer => allRetailers.add(retailer));
+        });
+        setRetailers(Array.from(allRetailers));
+      } else {
+        setRetailers([]);
+      }
+    }
+  }, [selectedCategory, categories]);
 
-  const filteredCategories = priceComparisons.map(category => ({
-    ...category,
-    items: category.items.filter(item =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  })).filter(category => category.items.length > 0);
+  const filteredItems = selectedCategory
+    ? categories
+        .find(cat => cat.category === selectedCategory)
+        ?.items.filter(item =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
+        ) || []
+    : [];
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
+      <Container>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress />
+        </Box>
       </Container>
     );
   }
 
   if (error) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">{error}</Alert>
+      <Container>
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Price Comparison
-      </Typography>
-
-      {/* Search and Store Selection */}
-      <Box sx={{ mb: 4, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <TextField
-          fullWidth
-          label="Search items"
-          variant="outlined"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-          }}
-        />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Select Store</InputLabel>
-          <Select
-            value={selectedStore}
-            label="Select Store"
-            onChange={(e) => setSelectedStore(e.target.value)}
-          >
-            <MenuItem value="all">All Stores</MenuItem>
-            {stores.map((store) => (
-              <MenuItem key={store.id} value={store.id}>
-                {store.name} - {store.location}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Price Comparison Grid */}
-      {filteredCategories.map((category) => (
-        <Box key={category.category} sx={{ mb: 6 }}>
-          <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-            {category.category}
-          </Typography>
-          <Grid container spacing={3}>
-            {category.items.map((item) => (
-              <Grid item xs={12} sm={6} md={4} lg={2.4} key={item.name}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'transform 0.2s',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                      boxShadow: 3
-                    }
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 200,
-                      overflow: 'hidden',
-                      position: 'relative'
-                    }}
-                  >
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {item.name}
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      {stores.map((store) => (
-                        <Typography 
-                          key={store.id} 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between',
-                            mb: 0.5
-                          }}
-                        >
-                          <span>{store.name}:</span>
-                          <span>£{item.prices[store.id].toFixed(2)}</span>
-                        </Typography>
-                      ))}
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+    <Container maxWidth="lg">
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Price Comparisons
+        </Typography>
+        
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                label="Category"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category.category} value={category.category}>
+                    {category.category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
-        </Box>
-      ))}
-
-      {/* Shopping List */}
-      <Card sx={{ mt: 6, border: '1px solid #e0e0e0' }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Shopping List
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+          
+          <Grid item xs={12} md={8}>
             <TextField
               fullWidth
-              label="Add item"
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
+              label="Search Items"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+              }}
             />
-            <IconButton color="primary" onClick={handleAddItem}>
-              <AddIcon />
-            </IconButton>
-          </Box>
-          <List>
-            {shoppingList.map((item) => (
-              <React.Fragment key={item.id}>
-                <ListItem>
-                  <ListItemText primary={item.name} />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleDeleteItem(item.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={3}>
+          {filteredItems.map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.name}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={item.image}
+                  alt={item.name}
+                  sx={{ objectFit: 'cover' }}
+                />
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {item.name}
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Typography variant="subtitle1" color="primary" gutterBottom>
+                    Prices:
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                    {Object.entries(item.prices).map(([retailer, price]) => (
+                      <Chip 
+                        key={retailer} 
+                        label={`${retailer}: £${price.toFixed(2)}`} 
+                        color="primary" 
+                        variant="outlined"
+                      />
+                    ))}
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Category: {selectedCategory}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Container>
   );
 }

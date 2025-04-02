@@ -6,11 +6,15 @@ const authRoutes = require('./api/routes/auth');
 const priceComparisonRoutes = require('./api/routes/priceComparisons');
 const accommodationRoutes = require('./api/routes/accommodations');
 const userRoutes = require('./api/routes/users');
+const auth = require('./middleware/auth');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Set mongoose strictQuery to false to suppress warning
@@ -19,13 +23,18 @@ mongoose.set('strictQuery', false);
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit if cannot connect to database
+  });
 
-// Routes
+// Public routes
 app.use('/api/auth', authRoutes);
-app.use('/api/price-comparisons', priceComparisonRoutes);
-app.use('/api/accommodations', accommodationRoutes);
-app.use('/api/users', userRoutes);
+
+// Protected routes
+app.use('/api/price-comparisons', auth, priceComparisonRoutes);
+app.use('/api/accommodations', auth, accommodationRoutes);
+app.use('/api/users', auth, userRoutes);
 
 // Test route
 app.get('/api/test', (req, res) => {
@@ -34,8 +43,11 @@ app.get('/api/test', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('Error:', err);
+  res.status(500).json({ 
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 // 404 handler

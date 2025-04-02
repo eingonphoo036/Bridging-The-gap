@@ -14,15 +14,6 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
-  Switch,
-  FormControlLabel,
-  Paper,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Chip,
   Alert,
   Snackbar,
   CircularProgress
@@ -32,19 +23,10 @@ import {
   Save as SaveIcon,
   Person as PersonIcon,
   Email as EmailIcon,
-  Phone as PhoneIcon,
-  LocationOn as LocationIcon,
-  AttachMoney as AttachMoneyIcon,
-  Group as GroupIcon,
   School as SchoolIcon,
-  Work as WorkIcon,
-  Add as AddIcon,
-  Delete as DeleteIcon,
+  LocationOn as LocationIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import SecurityIcon from '@mui/icons-material/Security';
-import LanguageIcon from '@mui/icons-material/Language';
 import { useAuth } from '../context/AuthContext';
 
 function Profile() {
@@ -54,13 +36,6 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
-  const [preferences, setPreferences] = useState({
-    emailNotifications: true,
-    priceAlerts: true,
-    roommateMatching: true,
-    language: 'English',
-  });
 
   useEffect(() => {
     if (user) {
@@ -79,216 +54,221 @@ function Profile() {
   const handleSave = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      // Get the token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+
+      // Get the user ID from the current user object
+      if (!user || !user.id) {
+        throw new Error('User ID not found. Please log in again.');
+      }
+
+      console.log('Updating user:', user.id);
+      console.log('Update data:', userInfo);
+
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(userInfo)
+        body: JSON.stringify({
+          name: userInfo.name,
+          university: userInfo.university,
+          location: userInfo.location
+        })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error(data.message || 'Failed to update profile');
       }
 
-      const updatedUser = await response.json();
-      setUser(updatedUser);
+      // Update the user context with the new data
+      setUser({
+        ...user,
+        ...data
+      });
+      
       setIsEditing(false);
       setSuccess(true);
     } catch (err) {
-      setError(err.message);
+      console.error('Profile update error:', err);
+      setError(err.message || 'Failed to update profile');
+      // If token is invalid, redirect to login
+      if (err.message.includes('token')) {
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlePreferenceChange = (preference) => (event) => {
-    setPreferences({
-      ...preferences,
-      [preference]: event.target.checked,
-    });
   };
 
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
         <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (!userInfo) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert severity="error">User data not found</Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Profile Settings
-      </Typography>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h4">Profile</Typography>
+            <Button
+              startIcon={isEditing ? <CloseIcon /> : <EditIcon />}
+              onClick={() => setIsEditing(!isEditing)}
+              color="primary"
+            >
+              {isEditing ? 'Cancel' : 'Edit Profile'}
+            </Button>
+          </Box>
 
-      <Grid container spacing={3}>
-        {/* Profile Information */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Avatar
-                sx={{
-                  width: 120,
-                  height: 120,
-                  margin: '0 auto 16px',
-                  bgcolor: 'primary.main',
-                }}
-              >
-                <PersonIcon sx={{ fontSize: 60 }} />
-              </Avatar>
-              <Typography variant="h6" gutterBottom>
-                {userInfo.name}
-              </Typography>
-              <Typography color="text.secondary" gutterBottom>
-                {userInfo.university}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {userInfo.major} • {userInfo.year}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-        {/* Edit Profile Form */}
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Personal Information
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Full Name"
-                    value={userInfo.name}
-                    onChange={handleInputChange('name')}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    value={userInfo.email}
-                    onChange={handleInputChange('email')}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Phone"
-                    value={userInfo.phone}
-                    onChange={handleInputChange('phone')}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Location"
-                    value={userInfo.location}
-                    onChange={handleInputChange('location')}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="University"
-                    value={userInfo.university}
-                    onChange={handleInputChange('university')}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Major"
-                    value={userInfo.major}
-                    onChange={handleInputChange('major')}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Year"
-                    value={userInfo.year}
-                    onChange={handleInputChange('year')}
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Avatar
+                  sx={{
+                    width: 120,
+                    height: 120,
+                    mb: 2,
+                    bgcolor: 'primary.main'
+                  }}
+                >
+                  {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : '?'}
+                </Avatar>
+                <Typography variant="h6">{userInfo.name || 'No Name'}</Typography>
+                <Typography color="textSecondary">{userInfo.role || 'Student'}</Typography>
+              </Box>
+            </Grid>
 
-        {/* Preferences */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Preferences
-              </Typography>
+            <Grid item xs={12} md={8}>
               <List>
                 <ListItem>
                   <ListItemIcon>
-                    <NotificationsIcon />
+                    <PersonIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Email Notifications"
-                    secondary="Receive updates about new properties and price changes"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={preferences.emailNotifications}
-                        onChange={handlePreferenceChange('emailNotifications')}
-                      />
+                    primary="Name"
+                    secondary={
+                      isEditing ? (
+                        <TextField
+                          fullWidth
+                          value={userInfo.name || ''}
+                          onChange={handleInputChange('name')}
+                          size="small"
+                        />
+                      ) : (
+                        userInfo.name || 'Not set'
+                      )
                     }
                   />
                 </ListItem>
                 <Divider />
                 <ListItem>
                   <ListItemIcon>
-                    <AttachMoneyIcon />
+                    <EmailIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Price Alerts"
-                    secondary="Get notified when prices change for your saved items"
+                    primary="Email"
+                    secondary={userInfo.email || 'Not set'}
                   />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={preferences.priceAlerts}
-                        onChange={handlePreferenceChange('priceAlerts')}
-                      />
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemIcon>
+                    <SchoolIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="University"
+                    secondary={
+                      isEditing ? (
+                        <TextField
+                          fullWidth
+                          value={userInfo.university || ''}
+                          onChange={handleInputChange('university')}
+                          size="small"
+                        />
+                      ) : (
+                        userInfo.university || 'Not set'
+                      )
                     }
                   />
                 </ListItem>
                 <Divider />
                 <ListItem>
                   <ListItemIcon>
-                    <GroupIcon />
+                    <LocationIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary="Roommate Matching"
-                    secondary="Allow other students to find you for roommate matching"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={preferences.roommateMatching}
-                        onChange={handlePreferenceChange('roommateMatching')}
-                      />
+                    primary="Location"
+                    secondary={
+                      isEditing ? (
+                        <TextField
+                          fullWidth
+                          value={userInfo.location || ''}
+                          onChange={handleInputChange('location')}
+                          size="small"
+                        />
+                      ) : (
+                        userInfo.location || 'Not set'
+                      )
                     }
                   />
                 </ListItem>
               </List>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
 
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="contained" color="primary">
-          Save Changes
-        </Button>
-      </Box>
+              {isEditing && (
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSave}
+                    disabled={loading}
+                  >
+                    Save Changes
+                  </Button>
+                </Box>
+              )}
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(false)}
+      >
+        <Alert onClose={() => setSuccess(false)} severity="success">
+          Profile updated successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
