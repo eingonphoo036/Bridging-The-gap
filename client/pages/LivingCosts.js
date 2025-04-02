@@ -41,7 +41,7 @@ function LivingCosts() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('${apiBaseUrl}/api/price-comparisons', {
+        const response = await fetch(`${apiBaseUrl}/api/price-comparisons`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
