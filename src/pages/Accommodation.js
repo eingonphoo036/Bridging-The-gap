@@ -30,6 +30,7 @@ import DirectionsWalkIcon from '@mui/icons-material/DirectionsWalk';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import { useAuth } from '../context/AuthContext';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'https://bridging-the-gap-9tqa.onrender.com';
 
 function Accommodation() {
   const [accommodations, setAccommodations] = useState([]);
@@ -52,7 +53,7 @@ function Accommodation() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('/api/accommodations', {
+        const response = await fetch('${apiBaseUrl}/api/accommodations', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
