@@ -1,15 +1,6 @@
 {
-  "short_name": "BridgingGap",
-  "name": "Bridging The Gap - Student Living Cost App",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    }
-  ],
+  "name": "Bridging The Gap",
+  "short_name": "Gap",
   "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "display": "standalone"
 }
