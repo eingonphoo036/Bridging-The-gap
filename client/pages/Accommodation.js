@@ -53,7 +53,7 @@ function Accommodation() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('${apiBaseUrl}/api/accommodations', {
+        const response = await fetch(`${apiBaseUrl}/api/accommodations`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
