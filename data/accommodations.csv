@@ -1,9 +1,0 @@
-name,location,address,price,rating,description,distance,walking_time,cycling_time,driving_time,latitude,longitude
-Apollo Works,Manchester,123 Oxford Road,£750,4.5,Modern student accommodation with great amenities,0.5,10,5,3,53.4667,-2.2333
-City Views,Manchester,456 Deansgate,£800,4.8,Luxury student living in the heart of the city,0.7,15,7,4,53.4789,-2.2456
-Student Village,Manchester,789 Fallowfield,£650,4.2,Traditional student housing with social spaces,1.2,25,12,6,53.4412,-2.2123
-The Hub,Manchester,321 Whitworth Street,£780,4.6,Contemporary student accommodation with study areas,0.8,16,8,4,53.4723,-2.2345
-The Oaks,Manchester,654 Wilmslow Road,£720,4.4,Comfortable student housing with garden,1.0,20,10,5,53.4567,-2.2234
-The Heights,Manchester,987 Princess Parkway,£680,4.3,High-rise student accommodation with city views,1.5,30,15,7,53.4890,-2.2567
-The Gardens,Manchester,147 Withington Road,£690,4.4,Peaceful student housing with green spaces,1.3,26,13,6,53.4456,-2.2345
-The Square,Manchester,258 Rusholme,£710,4.5,Modern student living with social hub,1.1,22,11,5,53.4678,-2.2234 
