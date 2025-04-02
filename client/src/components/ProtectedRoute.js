@@ -3,11 +3,12 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
-  const auth = useAuth(); // ✅ Get full auth object safely
   const location = useLocation();
+  const auth = useAuth();
 
-  if (!auth) {
-    return <div>Loading auth...</div>; // Prevent crash on undefined
+  
+  if (!auth || auth.loading === undefined) {
+    return <div>Loading authentication...</div>;
   }
 
   const { isAuthenticated, isAdmin, loading } = auth;
