@@ -11,6 +11,8 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'https://bridging-the-gap-9tqa.onrender.com';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('${apiBaseUrl}/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
