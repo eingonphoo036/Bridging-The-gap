@@ -11,6 +11,7 @@ import {
   Alert,
   Link
 } from '@mui/material';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'https://bridging-the-gap-9tqa.onrender.com';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('${apiBaseUrl}/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

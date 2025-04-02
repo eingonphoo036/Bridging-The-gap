@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuth } from '../context/AuthContext';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'https://bridging-the-gap-9tqa.onrender.com';
 
 function LivingCosts() {
   const [categories, setCategories] = useState([]);
@@ -40,7 +41,7 @@ function LivingCosts() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('/api/price-comparisons', {
+        const response = await fetch('${apiBaseUrl}/api/price-comparisons', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A web application to help students compare living costs",
   "main": "src/server.js",
-  "proxy": "http://localhost:5000",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
