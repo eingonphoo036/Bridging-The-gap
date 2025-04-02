@@ -1,6 +1,15 @@
 {
-  "name": "Bridging The Gap",
-  "short_name": "Gap",
+  "short_name": "BridgingGap",
+  "name": "Bridging The Gap - Student Cost Comparison",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64 32x32 24x24 16x16"
+    }
+  ],
   "start_url": ".",
-  "display": "standalone"
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }

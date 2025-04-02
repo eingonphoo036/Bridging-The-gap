@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';  // No need for <Router> here
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
@@ -97,41 +97,39 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/accommodation"
-              element={
-                <ProtectedRoute>
-                  <Accommodation />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/living-costs"
-              element={
-                <ProtectedRoute>
-                  <LivingCosts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/accommodation"
+            element={
+              <ProtectedRoute>
+                <Accommodation />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/living-costs"
+            element={
+              <ProtectedRoute>
+                <LivingCosts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </AuthProvider>
     </ThemeProvider>
   );
 }
 
-export default App; 
+export default App;
