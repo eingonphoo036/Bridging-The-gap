@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Test User",
+    "email": "test@test.com",
+    "password": "test123",
+    "role": "student",
+    "university": "University of Manchester",
+    "location": "Manchester, UK"
+  }
+] 

@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Apollo Works",
+    "location": "Coventry City Centre",
+    "address": "1 Apollo Way, Coventry CV1 5DL",
+    "price": 165,
+    "rating": 4.5,
+    "images": [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
+      "https://images.unsplash.com/photo-1555852105-64f35b45c695"
+    ],
+    "amenities": ["Gym", "Study Room", "Common Room", "Laundry"],
+    "description": "Modern student accommodation in the heart of Coventry",
+    "distance": "0.3 miles",
+    "walkingTime": "5 minutes",
+    "cyclingTime": "2 minutes",
+    "drivingTime": "1 minute",
+    "coordinates": {
+      "lat": 52.4081,
+      "lng": -1.5106
+    }
+  },
+  {
+    "name": "City Views",
+    "location": "Coventry City Centre",
+    "address": "New Union Street, Coventry, CV1 2NT",
+    "price": 180,
+    "rating": 4.8,
+    "images": [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
+      "https://images.unsplash.com/photo-1555852105-64f35b45c695"
+    ],
+    "amenities": ["En-suite", "Gym", "Cinema Room", "Study Area"],
+    "description": "Luxury student accommodation with panoramic city views",
+    "distance": "0.2 miles",
+    "walkingTime": "5 minutes",
+    "cyclingTime": "3 minutes",
+    "drivingTime": "2 minutes",
+    "coordinates": {
+      "lat": 52.4081,
+      "lng": -1.5106
+    }
+  },
+  {
+    "name": "Student Village",
+    "location": "Coventry University Area",
+    "address": "Priory Street, Coventry, CV1 5FB",
+    "price": 155,
+    "rating": 4.3,
+    "images": [
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267",
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
+      "https://images.unsplash.com/photo-1555852105-64f35b45c695"
+    ],
+    "amenities": ["Common Room", "Study Area", "Laundry", "Bike Storage"],
+    "description": "Traditional student accommodation with great community feel",
+    "distance": "0.4 miles",
+    "walkingTime": "8 minutes",
+    "cyclingTime": "4 minutes",
+    "drivingTime": "3 minutes",
+    "coordinates": {
+      "lat": 52.4081,
+      "lng": -1.5106
+    }
+  }
+] 
