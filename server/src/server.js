@@ -10,11 +10,12 @@ const auth = require('./middleware/auth');
 
 const app = express();
 
-// Middleware
+// ✅ Updated CORS to allow frontend on Vercel
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://bridging-the-gap-eight.vercel.app',
   credentials: true
 }));
+
 app.use(express.json());
 
 // Set mongoose strictQuery to false to suppress warning
@@ -58,4 +59,4 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});
