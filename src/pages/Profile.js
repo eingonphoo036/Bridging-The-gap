@@ -28,6 +28,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'https://bridging-the-gap-9tqa.onrender.com';
 
 function Profile() {
   const { user, setUser } = useAuth();
@@ -70,7 +71,7 @@ function Profile() {
       console.log('Updating user:', user.id);
       console.log('Update data:', userInfo);
 
-      const response = await fetch(`/api/users/${user.id}`, {
+      const response = await fetch(`${apiBaseUrl}/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
