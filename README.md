@@ -91,9 +91,3 @@ BSc (Hons) Computer Science – Coventry University
 This project is intended for academic and portfolio purposes only. Attribution required for reuse or modification.
 """
 
-# Save the content to a README.md file
-readme_path = "/mnt/data/README_BridgingTheGap.md"
-with open(readme_path, "w") as f:
-    f.write(readme_content)
-
-readme_path
