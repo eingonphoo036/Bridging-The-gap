@@ -1,5 +1,4 @@
-# Create a properly formatted README.md file with the user's correct project structure
-readme_content = """# 🧩 Bridging the Gap
+# 🧩 Bridging the Gap
 
 *A full-stack web application designed to simplify relocation for international students by integrating housing search and essential goods access into one unified platform.*
 
